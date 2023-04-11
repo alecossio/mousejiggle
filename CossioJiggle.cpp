@@ -100,6 +100,37 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_BORDER,
       CW_USEDEFAULT, 0, 100, 100, nullptr, nullptr, hInstance, nullptr);
 
+
+
+   HWND hwndJig = CreateWindowW(
+       L"BUTTON",  // Predefined class; Unicode assumed 
+       L"Jig",      // Button text 
+       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+       10,         // x position 
+       10,         // y position 
+       40,        // Button width
+       40,        // Button height
+       hWnd,     // Parent window
+       NULL,       // No menu.
+       (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+       NULL);      // Pointer not needed.
+   HWND hwndExit = CreateWindowW(
+       L"BUTTON",  // Predefined class; Unicode assumed 
+       L"Exit",      // Button text 
+       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_DEFPUSHBUTTON,  // Styles 
+       60,         // x position 
+       10,         // y position 
+       40,        // Button width
+       40,        // Button height
+       hWnd,     // Parent window
+       NULL,       // No menu.
+       (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
+       NULL);      // Pointer not needed.
+
+
+
+
+
    if (!hWnd)
    {
       return FALSE;
