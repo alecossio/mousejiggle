@@ -16,6 +16,13 @@
 #ifndef IDC_STATIC
 #define IDC_STATIC				-1
 #endif
+
+#define BUTTON_JIG				130
+#define BUTTON_EXIT				131
+#define IDT_TIMER1				132
+
+
+
 // Next default values for new objects
 //
 #ifdef APSTUDIO_INVOKED
