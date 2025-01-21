@@ -1,20 +1,44 @@
-// CossioJiggle.cpp : Defines the entry point for the application.
-//
-
 #include "framework.h"
 #include "CossioJiggle.h"
 #include <windowsx.h>
 
 #define MAX_LOADSTRING 100
 
-HINSTANCE hInst;                                // current instance
-WCHAR szTitle[MAX_LOADSTRING];                  // The title bar text
-WCHAR szWindowClass[MAX_LOADSTRING];            // the main window class name
+HINSTANCE hInst;
+WCHAR szTitle[MAX_LOADSTRING];
+WCHAR szWindowClass[MAX_LOADSTRING];
 
 ATOM                MyRegisterClass(HINSTANCE hInstance);
 BOOL                InitInstance(HINSTANCE, int);
 LRESULT CALLBACK    WndProc(HWND, UINT, WPARAM, LPARAM);
 INT_PTR CALLBACK    About(HWND, UINT, WPARAM, LPARAM);
+
+class Jiggler {
+private:
+    bool enabled = false;
+    INPUT input = { 0 };
+public:
+    Jiggler() {
+        input.type = INPUT_MOUSE;
+        input.mi.dwFlags = MOUSEEVENTF_MOVE;
+        input.mi.dx = 1;
+        input.mi.dy = 1;
+    }
+    void enable() {
+        this->enabled = true;
+    }
+    void disable() {
+        this->enabled = false;
+    }
+    void jiggle() {
+        if (enabled) {
+            input.mi.dx = -input.mi.dx;
+            input.mi.dy = -input.mi.dy;
+            SendInput(1, &input, sizeof(INPUT));
+        }
+    }
+};
+Jiggler jiggler;
 
 int APIENTRY wWinMain(_In_ HINSTANCE hInstance, _In_opt_ HINSTANCE hPrevInstance, _In_ LPWSTR    lpCmdLine,  _In_ int       nCmdShow)
 {
@@ -75,37 +99,37 @@ ATOM MyRegisterClass(HINSTANCE hInstance)
 
 BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 {
-   hInst = hInstance; // Store instance handle in our global variable
+   hInst = hInstance;
 
    HWND hWnd = CreateWindowW(szWindowClass, szTitle, WS_BORDER,
       CW_USEDEFAULT, 0, 100, 100, nullptr, nullptr, hInstance, nullptr);
 
-   SetTimer(hWnd, IDT_TIMER1, 10000, (TIMERPROC)NULL);
+   SetTimer(hWnd, IDT_TIMER1, 1000, (TIMERPROC)NULL);
 
    HWND hwndJig = CreateWindowW(
-       L"BUTTON",  // Predefined class; Unicode assumed 
-       L"Jig",      // Button text 
-       WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE,  // Styles 
-       10,         // x position 
-       10,         // y position 
-       40,        // Button width
-       40,        // Button height
-       hWnd,     // Parent window
-       (HMENU)BUTTON_JIG,       // Id
+       L"BUTTON",
+       L"Jig",
+       WS_CHILD | WS_VISIBLE | BS_AUTOCHECKBOX | BS_PUSHLIKE,
+       10,
+       10,
+       40,
+       40,
+       hWnd,
+       (HMENU)BUTTON_JIG,
        (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
-       NULL);      // Pointer not needed.
+       NULL);
    HWND hwndExit = CreateWindowW(
-       L"BUTTON",  // Predefined class; Unicode assumed 
-       L"Exit",      // Button text 
-       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,  // Styles 
-       70,         // x position 
-       10,         // y position 
-       40,        // Button width
-       40,        // Button height
-       hWnd,     // Parent window
-       (HMENU)BUTTON_EXIT,       // Id
+       L"BUTTON",
+       L"Exit",
+       WS_TABSTOP | WS_VISIBLE | WS_CHILD | BS_PUSHBUTTON,
+       70,
+       10,
+       40,
+       40,
+       hWnd,
+       (HMENU)BUTTON_EXIT,
        (HINSTANCE)GetWindowLongPtr(hWnd, GWLP_HINSTANCE),
-       NULL);      // Pointer not needed.
+       NULL);
 
    if (!hWnd)
    {
@@ -131,7 +155,9 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
                 break;
             case BUTTON_JIG:
                 if (Button_GetCheck((HWND)lParam) == BST_CHECKED)
-                    MessageBox(NULL, (LPCWSTR)L"Pushed", (LPCWSTR)L"Pushed", MB_ICONINFORMATION);
+                    jiggler.enable();
+                else
+                    jiggler.disable();
                 break;
             default:
                 return DefWindowProc(hWnd, message, wParam, lParam);
@@ -139,7 +165,7 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam){
         }
         break;
     case WM_TIMER:    
-        MessageBox(NULL, (LPCWSTR)L"Time!", (LPCWSTR)L"Time", MB_ICONINFORMATION);
+        jiggler.jiggle();
     case WM_PAINT:
         {
             PAINTSTRUCT ps;
